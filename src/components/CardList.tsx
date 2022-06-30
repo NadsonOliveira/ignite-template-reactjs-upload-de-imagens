@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card } from './Card';
 import { ModalViewImage } from './Modal/ViewImage';
 
-interface Card {
+export interface Card {
   title: string;
   description: string;
   url: string;
@@ -16,28 +16,31 @@ interface CardsProps {
 }
 
 export function CardList({ cards }: CardsProps): JSX.Element {
-  const { onOpen, isOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedImage, setSelectedImage] = useState('');
 
-  const [currentImageUrl, setCurrentImageUrl] = useState('');
-
-  function handleViewImage(url: string): void {
+  const handleImage = (url: string) => {
+    setSelectedImage(url);
     onOpen();
-    setCurrentImageUrl(url);
-  }
+  };
 
   return (
     <>
-      <SimpleGrid columns={[1, 2, 3]} spacing="40px">
-        {cards.map(card => (
-          // eslint-disable-next-line react/jsx-no-bind
-          <Card key={card.id} data={card} viewImage={handleViewImage} />
-        ))}
+      <SimpleGrid columns={3} spacing="40px">
+        {cards &&
+          cards.map((card, index) => (
+            <Card
+              key={index}
+              data={card}
+              viewImage={() => handleImage(card.url)}
+            />
+          ))}
       </SimpleGrid>
 
       <ModalViewImage
         isOpen={isOpen}
-        imgUrl={currentImageUrl}
         onClose={onClose}
+        imgUrl={selectedImage}
       />
     </>
   );
